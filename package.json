@@ -26,6 +26,6 @@
     "vite": "^5.1.4"
   },
   "engines": {
-    "node": "24.x"
+    " Node.js 24"
   }
 }
