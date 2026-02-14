@@ -1,29 +1,41 @@
 @import "tailwindcss";
 
-:root {
-  color-scheme: dark;
+@theme {
+  --color-indigo-500: #6366f1;
+  --color-violet-500: #8b5cf6;
+  --color-emerald-500: #10b981;
+  --color-rose-500: #f43f5e;
+  --color-zinc-950: #09090b;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
+/* Base Body Styles */
+@layer base {
+  body {
+    @apply bg-zinc-950 text-zinc-100 antialiased;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+    min-height: 100vh;
+  }
 }
 
-body {
-  @apply min-h-screen bg-zinc-950 text-zinc-100 antialiased;
-  background-image:
-    radial-gradient(circle at 12% 10%, rgba(99, 102, 241, 0.22), transparent 32%),
-    radial-gradient(circle at 85% 14%, rgba(139, 92, 246, 0.18), transparent 34%),
-    radial-gradient(circle at 82% 85%, rgba(16, 185, 129, 0.16), transparent 38%);
+/* Glassmorphism Utility */
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl;
+  }
+  
+  .glass-button {
+    @apply transition-all duration-200 active:scale-95 hover:bg-white/10;
+  }
 }
 
-.glass {
-  @apply border border-white/10 bg-white/5 backdrop-blur-[12px] transition;
+/* Custom Animation for AI Processing */
+@keyframes aurora-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
 }
 
-.glass:hover {
-  @apply border-white/20;
-}
-
-.processing-pulse {
-  @apply animate-pulse text-indigo-300 transition;
+.animate-aurora {
+  animation: aurora-pulse 3s infinite ease-in-out;
 }
