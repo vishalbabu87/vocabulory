@@ -1,7 +1,7 @@
 {
-  "name": "vocabforge-production",
+  "name": "vocabforge",
   "private": true,
-  "version": "1.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,20 +9,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "pdf-parse": "^1.1.1",
-    "mammoth": "^1.8.0",
+    "mammoth": "^1.4.26",
     "xlsx": "^0.18.5",
     "formidable": "^3.5.1",
-    "@google/generative-ai": "^0.21.0",
-    "lucide-react": "^0.477.0",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^2.6.0"
+    "@google/generative-ai": "^0.2.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.5.2",
-    "tailwindcss": "^4.0.6",
-    "vite": "^6.1.1"
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^4.0.0"
+  },
+  "engines": {
+    "node": "18.x"
   }
 }
