@@ -3,6 +3,8 @@ import clsx from 'clsx';
 
 const AUTO_NEXT_DELAY = 1200;
 
+function shuffle(items) {
+  const list = [...items];
 const shuffle = (arr) => {
   const list = [...arr];
   for (let i = list.length - 1; i > 0; i -= 1) {
@@ -10,6 +12,16 @@ const shuffle = (arr) => {
     [list[i], list[j]] = [list[j], list[i]];
   }
   return list;
+}
+
+function toQuestion(item, index) {
+  const correct = item.meaning || '';
+  const options = Array.isArray(item.options) ? item.options : [];
+  const normalized = shuffle(options).slice(0, 4);
+
+  if (correct && !normalized.includes(correct)) {
+    if (normalized.length < 4) normalized.push(correct);
+    else normalized[0] = correct;
 };
 
 const toQuestion = (item, index) => {
@@ -28,6 +40,9 @@ const toQuestion = (item, index) => {
     correct,
     options: normalized
   };
+}
+
+function ProgressBar({ value }) {
 };
 
 function ProgressBar({ percent }) {
@@ -35,6 +50,7 @@ function ProgressBar({ percent }) {
     <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
       <div
         className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500"
+        style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
         style={{ width: `${Math.max(0, Math.min(100, percent))}%` }}
       />
     </div>
@@ -50,12 +66,25 @@ export default function QuizEngine({ words = [], onComplete }) {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
   const [history, setHistory] = useState([]);
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  useEffect(() => {
+    setCurrentQuestion(0);
+    setScore(0);
+    setHistory([]);
+    setSelectedOption(null);
+  }, [questions.length]);
   const [selected, setSelected] = useState(null);
 
   const active = questions[currentQuestion];
   const progress = questions.length ? ((currentQuestion + 1) / questions.length) * 100 : 0;
 
   useEffect(() => {
+    if (!active || selectedOption === null) return undefined;
+
+    const timer = setTimeout(() => {
+      const isLast = currentQuestion >= questions.length - 1;
+      if (isLast) {
     if (selected === null || !active) return undefined;
 
     const timer = setTimeout(() => {
@@ -67,6 +96,19 @@ export default function QuizEngine({ words = [], onComplete }) {
       }
 
       setCurrentQuestion((prev) => prev + 1);
+      setSelectedOption(null);
+    }, AUTO_NEXT_DELAY);
+
+    return () => clearTimeout(timer);
+  }, [active, currentQuestion, history, onComplete, questions.length, score, selectedOption]);
+
+  const handleOptionClick = (option) => {
+    if (!active || selectedOption !== null) return;
+
+    setSelectedOption(option);
+    const isCorrect = option === active.correct;
+
+    if (isCorrect) setScore((prev) => prev + 1);
       setSelected(null);
     }, AUTO_NEXT_DELAY);
 
@@ -98,6 +140,7 @@ export default function QuizEngine({ words = [], onComplete }) {
   if (!questions.length) {
     return (
       <section className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-[12px]">
+        <p className="text-sm text-zinc-300">No quiz-ready words yet. Import a file to start.</p>
         <p className="text-sm text-zinc-300">No words available yet. Import words to start your quiz journey.</p>
       </section>
     );
@@ -110,6 +153,7 @@ export default function QuizEngine({ words = [], onComplete }) {
           <span>Question {currentQuestion + 1}/{questions.length}</span>
           <span>Score {score}</span>
         </div>
+        <ProgressBar value={progress} />
         <ProgressBar percent={progress} />
       </div>
 
@@ -121,6 +165,9 @@ export default function QuizEngine({ words = [], onComplete }) {
       <div className="grid gap-3">
         {active.options.map((option) => {
           const isCorrect = option === active.correct;
+          const isSelected = option === selectedOption;
+          const wrongSelected = selectedOption !== null && isSelected && !isCorrect;
+          const showCorrect = selectedOption !== null && isCorrect;
           const isSelected = selected === option;
           const wrongSelected = selected !== null && isSelected && !isCorrect;
           const showCorrect = selected !== null && isCorrect;
@@ -129,6 +176,8 @@ export default function QuizEngine({ words = [], onComplete }) {
             <button
               key={option}
               type="button"
+              disabled={selectedOption !== null}
+              onClick={() => handleOptionClick(option)}
               disabled={selected !== null}
               onClick={() => onSelect(option)}
               className={clsx(
@@ -136,6 +185,7 @@ export default function QuizEngine({ words = [], onComplete }) {
                 'border-white/10 bg-zinc-900/60 text-zinc-100',
                 wrongSelected && 'border-rose-500/80 bg-rose-500/20 text-rose-100',
                 showCorrect && 'border-emerald-500/70 bg-emerald-500/15 text-emerald-100',
+                selectedOption !== null && !wrongSelected && !showCorrect && 'opacity-70'
                 selected !== null && !wrongSelected && !showCorrect && 'opacity-70'
               )}
             >

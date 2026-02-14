@@ -1,5 +1,31 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: dark;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  @apply min-h-screen bg-zinc-950 text-zinc-100 antialiased;
+  background-image:
+    radial-gradient(circle at 12% 10%, rgba(99, 102, 241, 0.22), transparent 32%),
+    radial-gradient(circle at 85% 14%, rgba(139, 92, 246, 0.18), transparent 34%),
+    radial-gradient(circle at 82% 85%, rgba(16, 185, 129, 0.16), transparent 38%);
+}
+
+.glass {
+  @apply border border-white/10 bg-white/5 backdrop-blur-[12px] transition;
+}
+
+.glass:hover {
+  @apply border-white/20;
+}
+
+.processing-pulse {
+  @apply animate-pulse text-indigo-300 transition;
 @theme {
   --color-indigo-500: #6366f1;
   --color-violet-500: #8b5cf6;

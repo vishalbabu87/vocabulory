@@ -1,3 +1,7 @@
+import { createContext, useContext, useMemo, useState } from 'react';
+import { getWords, saveWords } from '../services/storageService';
+
+const QuizContext = createContext(null);
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 const STORAGE_KEY = 'vocabforge.quiz.words';
@@ -6,17 +10,31 @@ const defaultWords = [
   {
     word: 'Ubiquitous',
     meaning: 'Present, appearing, or found everywhere',
+    options: ['Present, appearing, or found everywhere', 'Rarely seen', 'Emotionally distant', 'Unclear and vague'],
     options: ['Rarely seen', 'Present everywhere', 'Highly technical', 'Difficult to understand'],
     category: 'Vocabulary'
   },
   {
     word: 'Break the ice',
     meaning: 'To initiate social interaction and reduce tension',
+    options: ['To initiate social interaction and reduce tension', 'To avoid all discussion', 'To postpone a conversation', 'To end a friendship'],
     options: ['Cause an argument', 'Start a conversation', 'End a meeting quickly', 'Ignore an awkward moment'],
     category: 'Idioms'
   }
 ];
 
+export function QuizProvider({ children }) {
+  const [words, setWords] = useState(() => {
+    const stored = getWords();
+    return stored.length ? stored : defaultWords;
+  });
+
+  const importWords = (incoming) => {
+    const merged = saveWords(incoming);
+    setWords(merged.length ? merged : defaultWords);
+  };
+
+  const value = useMemo(() => ({ words, importWords }), [words]);
 const QuizContext = createContext(null);
 
 const normalizeWord = (item) => ({
@@ -80,6 +98,7 @@ export function QuizProvider({ children }) {
 export function useQuiz() {
   const context = useContext(QuizContext);
   if (!context) {
+    throw new Error('useQuiz must be used inside QuizProvider');
     throw new Error('useQuiz must be used within QuizProvider');
   }
   return context;
